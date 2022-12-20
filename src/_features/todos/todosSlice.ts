@@ -1,12 +1,8 @@
 // features/todos/todosSlice.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Import the `RootState` type:
-import { RootState } from '../../app/store';
-
-const initialState: TodosState = {
-  list: [],
-};
+import { RootState } from "../../app/store";
 
 // We can safely reuse
 // types created earlier:
@@ -22,9 +18,13 @@ type TodosState = {
   list: Todo[];
 };
 
+const initialState: TodosState = {
+  list: [],
+};
+
 export const todosSlice = createSlice({
   // A name, used in action types:
-  name: 'todos',
+  name: "todos",
 
   // The initial state:
   initialState,
@@ -74,7 +74,8 @@ export const todosSlice = createSlice({
 // Export all of the actions:
 export const { addTodo, toggleTodo } = todosSlice.actions;
 
-// It is a convention to export reducer as a default export:
-export default todosSlice.reducer;
 // Create and export the selector:
 export const selectTodos = (state: RootState) => state.todos.list;
+
+// It is a convention to export reducer as a default export:
+export default todosSlice.reducer;

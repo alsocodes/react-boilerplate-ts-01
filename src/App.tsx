@@ -1,62 +1,100 @@
-import React from 'react';
-import logo from './logo.svg';
-import { Counter } from './features/counter/Counter';
-import './App.css';
-import { TodoList } from './features/todos/TodoList';
-import { AddTodo } from './features/todos/AddTodo';
+import React, { useEffect } from "react";
+import "./App.css";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import LoginPage from "./pages/Login";
+import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "./app/store";
+import { PersistLogin, selectAuth } from "./slices/AuthSlice";
+import DashboardPage from "./pages/Dashboard";
+import { selectAppConfig } from "./slices/ConfigSlice";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-function App() {
+const App = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  useEffect(() => {
+    dispatch(PersistLogin());
+  }, [dispatch]);
+
+  const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector;
+  const { persisting, loggedIn } = useTypedSelector(selectAuth);
+  const { toastData } = useTypedSelector(selectAppConfig);
+
+  // toast-toastan
+  useEffect(() => {
+    if (!toastData) return;
+
+    const { type, message } = toastData;
+
+    switch (type) {
+      case "error":
+        toast.error(message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        break;
+
+      case "success":
+        toast.success(message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        break;
+
+      default:
+        toast(message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+        break;
+    }
+    // dispatch(setToastData(null));
+  }, [toastData, dispatch]);
+
+  if (persisting) {
+    return null;
+  }
+
   return (
-    <div className='App'>
-      <header className='App-header'>
-        <TodoList />
-        <AddTodo />
-        {/* <img src={logo} className='App-logo' alt='logo' /> */}
-        {/* <Counter />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span> */}
-      </header>
-    </div>
+    <BrowserRouter>
+      {!loggedIn ? (
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="*" element={<Navigate replace to="/login" />} />
+        </Routes>
+      ) : (
+        <MainLayout />
+      )}
+      <ToastContainer />
+    </BrowserRouter>
   );
-}
+};
+
+const MainLayout = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<DashboardPage />} />
+      <Route path="*" element={<Navigate replace to="/" />} />
+    </Routes>
+  );
+};
 
 export default App;
