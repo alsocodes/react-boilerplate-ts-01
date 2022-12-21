@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
+import { APP_CONFIG_KEY } from "../../app/type.d";
 // import { APP_CONFIG_KEY } from "../../app/type.d";
 // import HttpCall from "../../utils/HttpCall";
 
@@ -14,16 +15,12 @@ export type ToastData = {
   message: string;
 };
 export type AppConfigState = {
-  listCabang: CabangData[];
-  cabangSelected: CabangData | null;
   themeSelected?: string | null;
   sidebarMode?: string | null;
   toastData?: ToastData | null;
 };
 
 const initialState: AppConfigState = {
-  listCabang: [],
-  cabangSelected: null,
   themeSelected: null,
   sidebarMode: null,
   toastData: null,
@@ -32,8 +29,32 @@ const initialState: AppConfigState = {
 export const SetToastData = createAsyncThunk(
   "appConfig/toastData",
   (toastData: ToastData) => {
-    console.log("here 2");
     return toastData;
+  }
+);
+
+export const SetThemeSelected = createAsyncThunk(
+  "appConfig/themeSelected",
+  (theme: string, thunkApi) => {
+    const { appConfig } = thunkApi.getState() as RootState;
+    localStorage.setItem(
+      APP_CONFIG_KEY,
+      JSON.stringify({ ...appConfig, themeSelected: theme })
+    );
+    return theme;
+  }
+);
+
+export const PersistConfig = createAsyncThunk(
+  "auth/persistConfig",
+  async () => {
+    try {
+      const storage = localStorage.getItem(APP_CONFIG_KEY);
+      const config: AppConfigState = storage ? JSON.parse(storage) : null;
+      return config;
+    } catch (err) {
+      throw err;
+    }
   }
 );
 
@@ -46,6 +67,19 @@ export const appConfigSlice = createSlice({
       SetToastData.fulfilled,
       (state: AppConfigState, { payload }) => {
         state.toastData = payload;
+      }
+    );
+    builder.addCase(
+      SetThemeSelected.fulfilled,
+      (state: AppConfigState, { payload }) => {
+        state.themeSelected = payload;
+      }
+    );
+    builder.addCase(
+      PersistConfig.fulfilled,
+      (state: AppConfigState, { payload }) => {
+        state.sidebarMode = payload.sidebarMode;
+        state.themeSelected = payload.themeSelected;
       }
     );
   },

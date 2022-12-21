@@ -78,6 +78,15 @@ export const PersistLogin = createAsyncThunk("auth/persistLogin", async () => {
   }
 });
 
+export const Logout = createAsyncThunk("auth/logout", async () => {
+  try {
+    localStorage.removeItem(AUTH_KEY);
+    return null;
+  } catch (err) {
+    throw err;
+  }
+});
+
 export const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -111,6 +120,13 @@ export const authSlice = createSlice({
     });
     builder.addCase(PersistLogin.rejected, (state: AuthState, { payload }) => {
       state.loading = false;
+    });
+    builder.addCase(Logout.fulfilled, (state: AuthState) => {
+      state.loggedIn = false;
+      state.persisting = false;
+      state.loading = false;
+      state.error = null;
+      state.userData = null;
     });
   },
 });
