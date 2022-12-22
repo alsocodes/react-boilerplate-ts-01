@@ -10,7 +10,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-import { RouteInterface, routes } from "./components/Sidebar/routes";
+import { RouteInterface, routes } from "./components/Sidebar2/routes";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useAppSelector } from "./app/hooks";
 import SidebarDua from "./components/Sidebar2";
@@ -87,7 +87,7 @@ const App = () => {
         {!loggedIn ? (
           <Routes>
             <Route path="/login" element={<LoginPage />} />
-            {/* <Route path="*" element={<Navigate replace to="/login" />} /> */}
+            <Route path="*" element={<Navigate replace to="/login" />} />
           </Routes>
         ) : (
           <MainLayout />
@@ -102,10 +102,11 @@ const MainLayout = (): JSX.Element => {
   const { userData } = useAppSelector(selectAuth);
   const renderRoute = useCallback(
     (route: RouteInterface) => {
+      // console.log(userData?.accesses, route.access, "xww");
       if (!userData?.accesses?.includes(route.access)) {
         return null;
       }
-
+      // console.log(route.name, "xwy");
       if (!route.childs) {
         return (
           <Route

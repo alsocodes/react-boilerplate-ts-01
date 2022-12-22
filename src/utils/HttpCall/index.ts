@@ -1,5 +1,7 @@
 import axios from "axios";
+import { useAppDispatch } from "../../app/hooks";
 import { AUTH_KEY } from "../../app/type.d";
+import { RefreshLogin } from "../../slices/AuthSlice";
 
 const storage = localStorage.getItem(AUTH_KEY);
 const { accessToken, refreshToken } = storage
@@ -7,13 +9,14 @@ const { accessToken, refreshToken } = storage
   : { accessToken: "", refreshToken: "" };
 
 const axiosApiInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: "http://192.168.0.26:9000",
   timeout: 30000,
 });
 
 // Request interceptor for API calls
 axiosApiInstance.interceptors.request.use(
   async (config) => {
+    console.log(config);
     config.headers = {
       Authorization: `Bearer ${accessToken}`,
       Accept: "application/json",
@@ -39,6 +42,9 @@ axiosApiInstance.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       // const access_token = await refreshAccessToken();
+      const dispatch = useAppDispatch();
+      dispatch(RefreshLogin());
+
       axios.defaults.headers.common["Authorization"] = "Bearer " + refreshToken;
       return axiosApiInstance(originalRequest);
     }

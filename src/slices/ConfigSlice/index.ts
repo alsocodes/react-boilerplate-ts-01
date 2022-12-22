@@ -78,8 +78,8 @@ export const appConfigSlice = createSlice({
     builder.addCase(
       PersistConfig.fulfilled,
       (state: AppConfigState, { payload }) => {
-        state.sidebarMode = payload.sidebarMode;
-        state.themeSelected = payload.themeSelected;
+        state.sidebarMode = payload?.sidebarMode || null;
+        state.themeSelected = payload?.themeSelected || null;
       }
     );
   },

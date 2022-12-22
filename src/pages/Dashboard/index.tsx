@@ -9,7 +9,8 @@ type Props = {
 const DashboardPage = ({ menu }: Props) => {
   const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(SetMenuActive(menu));
+    const { icon, ...payload } = menu;
+    dispatch(SetMenuActive(payload));
   }, [menu, dispatch]);
   return <div>DashboardPage</div>;
 };

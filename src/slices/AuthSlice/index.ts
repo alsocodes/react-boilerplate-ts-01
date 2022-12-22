@@ -23,7 +23,7 @@ export type AuthState = {
 
 const initialState: AuthState = {
   loggedIn: false,
-  persisting: false,
+  persisting: true,
   loading: false,
   error: null,
   userData: null,
@@ -63,6 +63,30 @@ export const PostLogin = createAsyncThunk(
       };
       dispatch(SetToastData(toastData));
 
+      throw err;
+    }
+  }
+);
+
+export const RefreshLogin = createAsyncThunk(
+  "auth/login",
+  async (_, { dispatch }) => {
+    try {
+      const { accessToken, refreshToken, user } = (
+        await HttpCall.get("/auth/login")
+      ).data.result;
+
+      const userData: UserData = {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        id: user.id,
+        name: user.name,
+        accesses: user.accesses,
+      };
+      // Store auth token
+      localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+      return userData;
+    } catch (err: any) {
       throw err;
     }
   }
