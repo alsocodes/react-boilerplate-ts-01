@@ -69,11 +69,11 @@ export const PostLogin = createAsyncThunk(
 );
 
 export const RefreshLogin = createAsyncThunk(
-  "auth/login",
-  async (_, { dispatch }) => {
+  "auth/refresh-login",
+  async (_) => {
     try {
       const { accessToken, refreshToken, user } = (
-        await HttpCall.get("/auth/login")
+        await HttpCall.get("/auth/refresh-login")
       ).data.result;
 
       const userData: UserData = {
@@ -83,6 +83,7 @@ export const RefreshLogin = createAsyncThunk(
         name: user.name,
         accesses: user.accesses,
       };
+      console.log("new acc", userData);
       // Store auth token
       localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
       return userData;
@@ -104,6 +105,7 @@ export const PersistLogin = createAsyncThunk("auth/persistLogin", async () => {
 
 export const Logout = createAsyncThunk("auth/logout", async () => {
   try {
+    await HttpCall.delete("/auth/logout");
     localStorage.removeItem(AUTH_KEY);
     return null;
   } catch (err) {
@@ -151,6 +153,13 @@ export const authSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.userData = null;
+    });
+    builder.addCase(RefreshLogin.fulfilled, (state: AuthState, { payload }) => {
+      state.loggedIn = payload !== null;
+      state.persisting = false;
+      state.loading = false;
+      state.error = null;
+      state.userData = payload;
     });
   },
 });

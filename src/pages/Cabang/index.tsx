@@ -1,12 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { IoPencilSharp, IoTrashBinSharp } from 'react-icons/io5';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { IGetParam } from '../../app/type';
-import { RouteInterface } from '../../components/Sidebar2/routes';
-import Table from '../../components/Table';
-import { GetCabang, selectCabang } from '../../slices/CabangSlice';
-import { CabangData } from '../../slices/ConfigSlice';
-import { SetMenuActive } from '../../slices/MenuSlice';
+import React, { useEffect, useRef, useState } from "react";
+import { IoPencilSharp, IoTrashBinSharp } from "react-icons/io5";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { IGetParam } from "../../app/type";
+import { RouteInterface } from "../../components/Sidebar2/routes";
+import Table from "../../components/Table";
+import { GetCabang, selectCabang } from "../../slices/CabangSlice";
+import { CabangData } from "../../slices/ConfigSlice";
+import { SetMenuActive } from "../../slices/MenuSlice";
 
 type Props = {
   menu: RouteInterface;
@@ -24,13 +24,13 @@ const CabangPage = ({ menu }: Props) => {
   const [params, setParams] = useState<IGetParam>({
     page: 1,
     size: 20,
-    search: '',
-    orderBy: 'kode',
-    order: 'asc',
+    search: "",
+    orderBy: "kode",
+    order: "asc",
   });
 
   useEffect(() => {
-    if (loading) return;
+    // if (loading) return;
     dispatch(GetCabang(params));
   }, [dispatch, params]);
 
@@ -48,25 +48,25 @@ const CabangPage = ({ menu }: Props) => {
   };
 
   const columns = [
-    { field: '', label: 'No', func: (obj: any) => obj.index + 1 },
-    { field: 'kode', label: 'Kode', sort: true },
-    { field: 'nama', label: 'Nama', sort: true },
-    { field: 'alamat', label: 'Alamat' },
+    { field: "", label: "No", func: (obj: any) => obj.index + 1 },
+    { field: "kode", label: "Kode", sort: true },
+    { field: "nama", label: "Nama", sort: true },
+    { field: "alamat", label: "Alamat" },
     {
-      field: '',
-      label: 'Action',
-      w: '100px',
+      field: "",
+      label: "Action",
+      w: "100px",
       func: (obj: any) => {
         return (
-          <div className='flex gap-1'>
-            <div className='tooltip' data-tip='Edit'>
-              <button className='btn btn-sm btn-accent'>
-                <IoPencilSharp />{' '}
+          <div className="flex gap-1">
+            <div className="tooltip" data-tip="Edit">
+              <button className="btn btn-sm btn-accent">
+                <IoPencilSharp />{" "}
               </button>
             </div>
-            <div className='tooltip' data-tip='Hapus'>
-              <button className='btn btn-sm btn-error'>
-                <IoTrashBinSharp />{' '}
+            <div className="tooltip" data-tip="Hapus">
+              <button className="btn btn-sm btn-error">
+                <IoTrashBinSharp />{" "}
               </button>
             </div>
           </div>
@@ -76,17 +76,17 @@ const CabangPage = ({ menu }: Props) => {
   ];
 
   return (
-    <div className=''>
-      <h1 className='font-bold text-2xl mb-4'>Cabang</h1>
-      <div className='flex gap-2'>
+    <div className="">
+      <h1 className="font-bold text-2xl mb-4">Cabang</h1>
+      <div className="flex gap-2">
         <div
           className={`flex flex-col flex-grow w-full max-w-2xl rounded-lg bg-base-300 px-6 py-4 ${
-            detail === undefined && 'hidden'
+            detail === undefined && "hidden"
           } transition-transform duration-150 ease-in`}
         >
           a
         </div>
-        <div className='flex flex-col flex-grow rounded-lg bg-base-300 px-6 py-4 transition-transform duration-150 ease-in'>
+        <div className="flex flex-col flex-grow rounded-lg bg-base-300 px-6 py-4 transition-transform duration-150 ease-in">
           <Table
             data={listCabang}
             columns={columns}

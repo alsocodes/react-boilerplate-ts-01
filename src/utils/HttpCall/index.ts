@@ -1,17 +1,10 @@
-import axios from 'axios';
-import { useAppDispatch } from '../../app/hooks';
-import { store } from '../../app/store';
-import { AUTH_KEY } from '../../app/type.d';
-import { RefreshLogin } from '../../slices/AuthSlice';
-import { SetProgress, SetToastData } from '../../slices/ConfigSlice';
-
-const storage = localStorage.getItem(AUTH_KEY);
-const { accessToken, refreshToken } = storage
-  ? JSON.parse(storage)
-  : { accessToken: '', refreshToken: '' };
+import axios from "axios";
+import { store } from "../../app/store";
+import { Logout, RefreshLogin } from "../../slices/AuthSlice";
+import { SetProgress, SetToastData } from "../../slices/ConfigSlice";
 
 const axiosApiInstance = axios.create({
-  baseURL: 'http://192.168.0.26:9000',
+  baseURL: "http://192.168.0.26:9000",
   timeout: 30000,
 });
 
@@ -19,9 +12,14 @@ const axiosApiInstance = axios.create({
 axiosApiInstance.interceptors.request.use(
   async (config) => {
     store.dispatch(SetProgress(true));
+    const userData = store.getState().auth.userData;
+    const token =
+      config.url === "/auth/refresh-login"
+        ? userData?.refreshToken
+        : userData?.accessToken;
     config.headers = {
-      Authorization: `Bearer ${accessToken}`,
-      Accept: 'application/json',
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
     };
     return config;
   },
@@ -37,20 +35,24 @@ axiosApiInstance.interceptors.response.use(
     return response;
   },
   async function (error) {
-    store.dispatch(SetProgress(true));
-    const originalRequest = error.config;
-    if (
-      error.response.status === 401 &&
-      !originalRequest._retry &&
-      refreshToken
-    ) {
-      originalRequest._retry = true;
-      // const access_token = await refreshAccessToken();
-      const dispatch = useAppDispatch();
-      dispatch(RefreshLogin());
+    store.dispatch(SetProgress(false));
+    if (error.response.status === 401) {
+      const originalRequest = error.config;
+      const userData = store.getState().auth.userData;
+      if (
+        !originalRequest._retry &&
+        userData?.refreshToken &&
+        error.config.url !== "/auth/refresh-login"
+      ) {
+        originalRequest._retry = true;
+        const { payload }: any = await store.dispatch(RefreshLogin());
+        // console.log("xp", payload.accessToken);
 
-      axios.defaults.headers.common['Authorization'] = 'Bearer ' + refreshToken;
-      return axiosApiInstance(originalRequest);
+        axios.defaults.headers.common["Authorization"] =
+          "Bearer " + payload.accessToken;
+        return axiosApiInstance(originalRequest);
+      }
+      store.dispatch(Logout());
     }
 
     return Promise.reject(error);
