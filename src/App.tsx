@@ -1,32 +1,30 @@
-import React, { useCallback, useEffect, useState } from "react";
-import "./App.css";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import LoginPage from "./pages/Login";
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "./app/store";
-import { PersistLogin, selectAuth } from "./slices/AuthSlice";
-import { PersistConfig, selectAppConfig } from "./slices/ConfigSlice";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import Navbar from "./components/Navbar";
-import Sidebar from "./components/Sidebar";
-import { RouteInterface, routes } from "./components/Sidebar2/routes";
-import { useHotkeys } from "react-hotkeys-hook";
-import { useAppSelector } from "./app/hooks";
-import SidebarDua from "./components/Sidebar2";
-import { getPages } from "./pages";
+import React, { useCallback, useEffect, useState } from 'react';
+import './App.css';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import LoginPage from './pages/Login';
+import { PersistLogin, selectAuth } from './slices/AuthSlice';
+import { PersistConfig, selectAppConfig } from './slices/ConfigSlice';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Navbar from './components/Navbar';
+import { RouteInterface, routes } from './components/Sidebar2/routes';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { useAppDispatch, useAppSelector } from './app/hooks';
+import SidebarDua from './components/Sidebar2';
+import { getPages } from './pages';
+import Progressbar from './components/Progressbar';
 // import NotfoundPage from "./pages/Notfound";
 
 const App = () => {
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(PersistLogin());
     dispatch(PersistConfig());
   }, [dispatch]);
 
-  const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector;
-  const { persisting, loggedIn } = useTypedSelector(selectAuth);
-  const { toastData, themeSelected } = useTypedSelector(selectAppConfig);
+  const { persisting, loggedIn } = useAppSelector(selectAuth);
+  const { toastData, themeSelected, progress } =
+    useAppSelector(selectAppConfig);
 
   // toast-toastan
   useEffect(() => {
@@ -35,42 +33,42 @@ const App = () => {
     const { type, message } = toastData;
 
     switch (type) {
-      case "error":
+      case 'error':
         toast.error(message, {
-          position: "bottom-right",
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "light",
+          theme: 'light',
         });
         break;
 
-      case "success":
+      case 'success':
         toast.success(message, {
-          position: "bottom-right",
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "light",
+          theme: 'light',
         });
         break;
 
       default:
         toast(message, {
-          position: "bottom-right",
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "light",
+          theme: 'light',
         });
         break;
     }
@@ -83,11 +81,12 @@ const App = () => {
 
   return (
     <div data-theme={themeSelected}>
+      <Progressbar progress={progress} />
       <BrowserRouter>
         {!loggedIn ? (
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="*" element={<Navigate replace to="/login" />} />
+            <Route path='/login' element={<LoginPage />} />
+            <Route path='*' element={<Navigate replace to='/login' />} />
           </Routes>
         ) : (
           <MainLayout />
@@ -137,57 +136,50 @@ const MainLayout = (): JSX.Element => {
   const [checkedCb, setCheckedCb] = useState<boolean>(false);
 
   useHotkeys(
-    "alt+s",
+    'alt+s',
     (e) => {
       e.preventDefault();
       e.stopPropagation();
       // console.log('alt+s');
       setCheckedCb((checkedCb) => !checkedCb);
     },
-    { enableOnFormTags: ["TEXTAREA", "INPUT"] }
+    { enableOnFormTags: ['TEXTAREA', 'INPUT'] }
   );
 
   return (
-    <div className="h-screen">
+    <div className='h-screen'>
       <Navbar setCheckedCb={setCheckedCb} />
-      <div className="">
+      <div className=''>
         <SidebarDua>
-          <div className="flex flex-col flex-grow rounded-lg bg-base-300 p-4">
-            <Routes>
-              {routes.map(renderRoute)}
-              <Route path="/login" element={<Navigate replace to="/" />} />
-            </Routes>
-          </div>
+          <Routes>
+            {routes.map(renderRoute)}
+            <Route path='/login' element={<Navigate replace to='/' />} />
+          </Routes>
         </SidebarDua>
       </div>
     </div>
   );
-  {
-    /*           
-    <h1 className="font-bold text-2xl">Dashboard</h1>
-  </div> */
-  }
 
-  return (
-    <div className="drawer">
-      <input
-        id="my-drawer"
-        type="checkbox"
-        className="drawer-toggle"
-        checked={checkedCb}
-        onChange={(e) => setCheckedCb(e.target.checked)}
-      />
-      <div className="drawer-content">
-        <Navbar setCheckedCb={setCheckedCb} />
-        <Routes>
-          {routes.map(renderRoute)}
-          {/* <Route path="*" element={<NotfoundPage />} /> */}
-          <Route path="/login" element={<Navigate replace to="/" />} />
-        </Routes>
-      </div>
-      <Sidebar isShow={checkedCb} setIsShow={setCheckedCb} />
-    </div>
-  );
+  // return (
+  //   <div className="drawer">
+  //     <input
+  //       id="my-drawer"
+  //       type="checkbox"
+  //       className="drawer-toggle"
+  //       checked={checkedCb}
+  //       onChange={(e) => setCheckedCb(e.target.checked)}
+  //     />
+  //     <div className="drawer-content">
+  //       <Navbar setCheckedCb={setCheckedCb} />
+  //       <Routes>
+  //         {routes.map(renderRoute)}
+  //         {/* <Route path="*" element={<NotfoundPage />} /> */}
+  //         <Route path="/login" element={<Navigate replace to="/" />} />
+  //       </Routes>
+  //     </div>
+  //     <Sidebar isShow={checkedCb} setIsShow={setCheckedCb} />
+  //   </div>
+  // );
 };
 
 export default App;

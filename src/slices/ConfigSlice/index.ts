@@ -1,6 +1,6 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../../app/store";
-import { APP_CONFIG_KEY } from "../../app/type.d";
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { RootState } from '../../app/store';
+import { APP_CONFIG_KEY } from '../../app/type.d';
 // import { APP_CONFIG_KEY } from "../../app/type.d";
 // import HttpCall from "../../utils/HttpCall";
 
@@ -18,23 +18,32 @@ export type AppConfigState = {
   themeSelected?: string | null;
   sidebarMode?: string | null;
   toastData?: ToastData | null;
+  progress: boolean;
 };
 
 const initialState: AppConfigState = {
   themeSelected: null,
   sidebarMode: null,
   toastData: null,
+  progress: false,
 };
 
 export const SetToastData = createAsyncThunk(
-  "appConfig/toastData",
+  'appConfig/toastData',
   (toastData: ToastData) => {
     return toastData;
   }
 );
 
+export const SetProgress = createAsyncThunk(
+  'appConfig/progress',
+  (progress: boolean) => {
+    return progress;
+  }
+);
+
 export const SetThemeSelected = createAsyncThunk(
-  "appConfig/themeSelected",
+  'appConfig/themeSelected',
   (theme: string, thunkApi) => {
     const { appConfig } = thunkApi.getState() as RootState;
     localStorage.setItem(
@@ -46,7 +55,7 @@ export const SetThemeSelected = createAsyncThunk(
 );
 
 export const PersistConfig = createAsyncThunk(
-  "auth/persistConfig",
+  'auth/persistConfig',
   async () => {
     try {
       const storage = localStorage.getItem(APP_CONFIG_KEY);
@@ -59,7 +68,7 @@ export const PersistConfig = createAsyncThunk(
 );
 
 export const appConfigSlice = createSlice({
-  name: "appConfig",
+  name: 'appConfig',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -80,6 +89,12 @@ export const appConfigSlice = createSlice({
       (state: AppConfigState, { payload }) => {
         state.sidebarMode = payload?.sidebarMode || null;
         state.themeSelected = payload?.themeSelected || null;
+      }
+    );
+    builder.addCase(
+      SetProgress.fulfilled,
+      (state: AppConfigState, { payload }) => {
+        state.progress = payload;
       }
     );
   },
