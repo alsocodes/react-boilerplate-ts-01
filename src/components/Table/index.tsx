@@ -1,6 +1,6 @@
-import React, { FC, useEffect, useState } from 'react';
-import { IoChevronDownSharp } from 'react-icons/io5';
-import SortableTH from '../SortableTH';
+import React, { FC, useEffect, useState } from "react";
+import { IoChevronDownSharp } from "react-icons/io5";
+import SortableTH from "../SortableTH";
 
 type Props = {
   zebra?: boolean;
@@ -54,26 +54,26 @@ const Table: FC<Props> = ({
   };
 
   return (
-    <div className='overflow-x-auto'>
-      <div className='flex justify-between mb-2 p-1'>
-        {typeof search !== 'undefined' && (
+    <div className="overflow-x-auto h-100">
+      <div className="flex justify-between mb-2 p-1">
+        {typeof search !== "undefined" && (
           <input
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === "Enter") {
                 onParamChange({ search: onTypeSearch });
               }
             }}
             onChange={(e) => setOnTypeSearch(e.target.value)}
-            type='text'
-            placeholder='Pencarian'
-            className='input input-bordered w-full max-w-sm'
+            type="text"
+            placeholder="Pencarian"
+            className="input input-bordered w-full max-w-sm"
           />
         )}
-        {typeof addAction !== 'undefined' && (
-          <div className='self-end'>
+        {typeof addAction !== "undefined" && (
+          <div className="self-end">
             <button
-              onClick={() => addAction(null)}
-              className='btn btn-primary btn-md'
+              onClick={() => addAction({ action: "add", data: null })}
+              className="btn btn-primary btn-md"
             >
               Tambah
             </button>
@@ -81,15 +81,15 @@ const Table: FC<Props> = ({
         )}
       </div>
       <table
-        className={`table w-full ${zebra && 'table-zebra'} ${
-          compact && 'table-compact'
+        className={`table w-full ${zebra && "table-zebra"} ${
+          compact && "table-compact"
         }`}
       >
         <thead>
           <tr>
             {columns?.map(({ label, sort, field }, i) => {
               return (
-                <th className='py-4' key={`th-${i}`}>
+                <th className="py-4" key={`th-${i}`}>
                   {sort ? (
                     <SortableTH
                       field={field}
@@ -106,21 +106,21 @@ const Table: FC<Props> = ({
             })}
           </tr>
         </thead>
-        <tbody className='relative'>
+        <tbody className="relative">
           {data?.length < 1 ? (
             <tr>
-              <td className='p-4 text-center' colSpan={columns.length}>
+              <td className="p-4 text-center" colSpan={columns.length}>
                 Tidak ada data
               </td>
             </tr>
           ) : (
             data?.map((row, index) => {
               return (
-                <tr key={`row-${index}`} className={`${hover && 'hover'}`}>
+                <tr key={`row-${index}`} className={`${hover && "hover"}`}>
                   {columns.map((c, ii) => {
                     const { field, func, w } = c;
                     const value =
-                      typeof func === 'function'
+                      typeof func === "function"
                         ? func({ value: row[field], row, index })
                         : row[field];
                     return (
@@ -138,11 +138,11 @@ const Table: FC<Props> = ({
           )}
         </tbody>
       </table>
-      <div className='my-2 flex justify-between px-1'>
-        <div className='flex justify-center align-middle'>
-          <div className='btn-group'>
+      <div className="my-2 flex justify-between px-1">
+        <div className="flex justify-center align-middle">
+          <div className="btn-group">
             {pageingButtons.map((p: any, i: number) => {
-              const active = p === page ? 'btn-active' : '';
+              const active = p === page ? "btn-active" : "";
               return (
                 <button key={`p-${i}`} className={`btn btn-md ${active}`}>
                   {p}
@@ -150,12 +150,12 @@ const Table: FC<Props> = ({
               );
             })}
           </div>
-          <div className='px-4 py-2'>
+          <div className="px-4 py-2">
             Menampilkan {showFrom + 1} - {showTo} dari {count}
           </div>
         </div>
         <select
-          className='select select-md w-20'
+          className="select select-md w-20"
           defaultValue={size}
           onChange={(e) => onParamChange({ size: Number(e.target.value) })}
         >
@@ -191,7 +191,7 @@ const paginationGenerator = (current: number, last: number, width = 2) => {
       if (i - l === 2) {
         rangeWithDots.push(l + 1);
       } else if (i - l !== 1) {
-        rangeWithDots.push('...');
+        rangeWithDots.push("...");
       }
     }
     rangeWithDots.push(i);

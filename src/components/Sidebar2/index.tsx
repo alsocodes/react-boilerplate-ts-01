@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
+import { selectAppConfig } from "../../slices/ConfigSlice";
 import { selectMenu } from "../../slices/MenuSlice";
 import { routes } from "./routes";
 
@@ -8,20 +9,15 @@ type Props = {
   children: JSX.Element;
 };
 
-const SidebarItem = ({ active, route }: any) => {
+const SidebarItem = ({ active, route, hideLabel }: any) => {
   const { name, type, label, icon: Icon, path } = route;
   const isActive = active?.name === name ? "active" : "";
-  const [hideLabel, setHidelabel] = useState(true);
 
   if (type === "label") {
     return (
       <li className="my-px" key={name}>
-        <span
-          className={`flex font-medium text-sm px-4 my-1 ${
-            hideLabel && "hidden"
-          }`}
-        >
-          {label}
+        <span className={`flex font-medium text-sm px-4 my-1 rounded-lg`}>
+          {hideLabel ? "..." : label}
         </span>
       </li>
     );
@@ -43,25 +39,45 @@ const SidebarItem = ({ active, route }: any) => {
 
 const SidebarDua = ({ children }: Props) => {
   const { active } = useAppSelector(selectMenu);
-  const [hideLabel, setHidelabel] = useState(true);
+  const { hideSidebar } = useAppSelector(selectAppConfig);
+
+  const [hide, setHide] = useState(hideSidebar);
+  useEffect(() => {
+    setHide(hideSidebar);
+  }, [hideSidebar]);
+
+  const onMouseHover = (val: boolean) => {
+    if (!hideSidebar) return;
+    setHide(val);
+  };
+
   return (
-    <div className="flex flex-row min-h-screen bg-base-100 text-base-content">
+    // flex-row
+    <div className="flex min-h-screen bg-base-100 text-base-content">
       <aside
+        onMouseOver={() => onMouseHover(false)}
+        onMouseOut={() => onMouseHover(true)}
         className={`${
-          !hideLabel && "w-64"
-        } bg-base-100 sidebar transform -translate-x-full md:translate-x-0 transition-transform duration-150 ease-in`}
+          hide ? "w-0 md:w-20" : "w-44 md:w-52"
+        } bg-base-100 sidebar transition-all duration-300 ease-in-out overflow-hidden`}
       >
         <div className="sidebar-content px-4 py-2">
           <ul className="menu flex flex-col w-full">
             {routes.map((route, i) => {
               return (
-                <SidebarItem active={active} key={`s-${i}`} route={route} />
+                <SidebarItem
+                  hideLabel={hide}
+                  active={active}
+                  key={`s-${i}`}
+                  route={route}
+                />
               );
             })}
           </ul>
         </div>
       </aside>
-      <main className="main flex flex-col flex-grow -ml-64 md:ml-0 transition-all duration-150 ease-in">
+      {/* flexx flex-colx */}
+      <main className="main flex-grow transition-all duration-150 ease-in">
         <div className="main-content flex flex-col flex-grow px-4 py-2">
           {children}
         </div>

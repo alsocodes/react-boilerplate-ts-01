@@ -1,18 +1,18 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import './App.css';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import LoginPage from './pages/Login';
-import { PersistLogin, selectAuth } from './slices/AuthSlice';
-import { PersistConfig, selectAppConfig } from './slices/ConfigSlice';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Navbar from './components/Navbar';
-import { RouteInterface, routes } from './components/Sidebar2/routes';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { useAppDispatch, useAppSelector } from './app/hooks';
-import SidebarDua from './components/Sidebar2';
-import { getPages } from './pages';
-import Progressbar from './components/Progressbar';
+import React, { useCallback, useEffect, useState } from "react";
+import "./App.css";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import LoginPage from "./pages/Login";
+import { PersistLogin, selectAuth } from "./slices/AuthSlice";
+import { PersistConfig, selectAppConfig } from "./slices/ConfigSlice";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Navbar from "./components/Navbar";
+import { RouteInterface, routes } from "./components/Sidebar2/routes";
+import { useHotkeys } from "react-hotkeys-hook";
+import { useAppDispatch, useAppSelector } from "./app/hooks";
+import SidebarDua from "./components/Sidebar2";
+import { getPages } from "./pages";
+import Progressbar from "./components/Progressbar";
 // import NotfoundPage from "./pages/Notfound";
 
 const App = () => {
@@ -33,42 +33,42 @@ const App = () => {
     const { type, message } = toastData;
 
     switch (type) {
-      case 'error':
+      case "error":
         toast.error(message, {
-          position: 'bottom-right',
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: 'light',
+          theme: "light",
         });
         break;
 
-      case 'success':
+      case "success":
         toast.success(message, {
-          position: 'bottom-right',
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: 'light',
+          theme: "light",
         });
         break;
 
       default:
         toast(message, {
-          position: 'bottom-right',
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: 'light',
+          theme: "light",
         });
         break;
     }
@@ -85,8 +85,8 @@ const App = () => {
       <BrowserRouter>
         {!loggedIn ? (
           <Routes>
-            <Route path='/login' element={<LoginPage />} />
-            <Route path='*' element={<Navigate replace to='/login' />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="*" element={<Navigate replace to="/login" />} />
           </Routes>
         ) : (
           <MainLayout />
@@ -136,24 +136,24 @@ const MainLayout = (): JSX.Element => {
   const [checkedCb, setCheckedCb] = useState<boolean>(false);
 
   useHotkeys(
-    'alt+s',
+    "alt+s",
     (e) => {
       e.preventDefault();
       e.stopPropagation();
       // console.log('alt+s');
       setCheckedCb((checkedCb) => !checkedCb);
     },
-    { enableOnFormTags: ['TEXTAREA', 'INPUT'] }
+    { enableOnFormTags: ["TEXTAREA", "INPUT"] }
   );
 
   return (
-    <div className='h-screen'>
+    <div className="h-screen">
       <Navbar setCheckedCb={setCheckedCb} />
-      <div className=''>
+      <div className="overflow-hidden">
         <SidebarDua>
           <Routes>
             {routes.map(renderRoute)}
-            <Route path='/login' element={<Navigate replace to='/' />} />
+            <Route path="/login" element={<Navigate replace to="/" />} />
           </Routes>
         </SidebarDua>
       </div>

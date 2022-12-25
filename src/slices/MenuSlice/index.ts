@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { RouteInterface } from "../../components/Sidebar2/routes";
 
@@ -18,7 +18,7 @@ export const SetMenuActive = createAsyncThunk(
 );
 
 export const menuSlice = createSlice({
-  name: "appConfig",
+  name: "menu",
   initialState,
   reducers: {},
   extraReducers: (builder) => {

@@ -1,6 +1,7 @@
 import React, { FC } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Logout, selectAuth } from "../../slices/AuthSlice";
+import { SetSidebar } from "../../slices/ConfigSlice";
 import ThemeSwitcher from "../ThemeSwitcher";
 
 type Props = {
@@ -11,12 +12,12 @@ const Navbar: FC<Props> = ({ setCheckedCb }): JSX.Element => {
   const { userData } = useAppSelector(selectAuth);
   const dispatch = useAppDispatch();
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-base-100 px-2">
       <div className="flex-none">
         <label
           // htmlFor="my-drawer"
-          onClick={() => setCheckedCb(true)}
-          className="btn btn-sm btn-square btn-ghost drawer-button"
+          onClick={() => dispatch(SetSidebar())}
+          className="btn btn-md btn-square btn-ghost drawer-button"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

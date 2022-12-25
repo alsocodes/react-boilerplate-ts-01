@@ -1,7 +1,8 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../app/store';
-import { FormResult, IGetParam } from '../../app/type.d';
-import HttpCall from '../../utils/HttpCall';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { RootState } from "../../app/store";
+import { FormResult, IGetParam } from "../../app/type.d";
+import { IFormCabang } from "../../pages/Cabang/Detail";
+import HttpCall from "../../utils/HttpCall";
 
 export type CabangData = {
   publicId: string;
@@ -31,17 +32,26 @@ const initialState: CabangState = {
 };
 
 export const GetCabang = createAsyncThunk(
-  'cabang/getCabang',
+  "cabang/getCabang",
   async (params: IGetParam) => {
     try {
-      const { result } = (await HttpCall.get('/cabang', { params })).data;
+      const { result } = (await HttpCall.get("/cabang", { params })).data;
       return result;
     } catch (error) {}
   }
 );
 
+export const PostCabang = createAsyncThunk(
+  "cabang/postCabang",
+  async (payload: IFormCabang) => {
+    try {
+      const { result } = (await HttpCall.post("/cabang", { ...payload })).data;
+    } catch (error) {}
+  }
+);
+
 export const cabangSlice = createSlice({
-  name: 'appConfig',
+  name: "appConfig",
   initialState,
   reducers: {},
   extraReducers: (builder) => {

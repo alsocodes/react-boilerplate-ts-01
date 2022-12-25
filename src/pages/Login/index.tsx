@@ -74,10 +74,7 @@ const LoginPage = () => {
               })}
 
               <div className="text-center lg:text-right mt-4">
-                <button
-                  className="btn btn-primary btn-secondary px-5"
-                  type="submit"
-                >
+                <button className="btn btn-primary px-5" type="submit">
                   Login
                 </button>
               </div>

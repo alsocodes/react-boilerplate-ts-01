@@ -46,17 +46,28 @@ const TextInput: FC<TextInputInterface> = ({
   return (
     <div className="form-control w-full">
       <label className="label">
-        <span className="label-text">{label}</span>
+        {label && <span className="label-text">{label}</span>}
       </label>
-      <input
-        type={type}
-        placeholder={placeholder}
-        id={name}
-        readOnly={readOnly}
-        defaultValue={defaultValue}
-        {...register}
-        className={`input input-bordered w-full ${className}`}
-      />
+      {type === "textarea" ? (
+        <textarea
+          id={name}
+          readOnly={readOnly}
+          defaultValue={defaultValue}
+          {...register}
+          className={`textarea textarea-bordered h-24 w-full ${className}`}
+          placeholder={placeholder}
+        />
+      ) : (
+        <input
+          type={type}
+          placeholder={placeholder}
+          id={name}
+          readOnly={readOnly}
+          defaultValue={defaultValue}
+          {...register}
+          className={`input input-bordered w-full ${className}`}
+        />
+      )}
       <label className="label ">
         {error && (
           <span className="label-text-alt text-red-500">{error.message}</span>

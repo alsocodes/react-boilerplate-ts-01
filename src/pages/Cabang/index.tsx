@@ -1,17 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
-import { IoPencilSharp, IoTrashBinSharp } from "react-icons/io5";
+import {
+  IoChevronBackSharp,
+  IoChevronForwardSharp,
+  IoClose,
+  IoPencilSharp,
+  IoTrashBinSharp,
+} from "react-icons/io5";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { IGetParam } from "../../app/type";
 import { RouteInterface } from "../../components/Sidebar2/routes";
 import Table from "../../components/Table";
 import { GetCabang, selectCabang } from "../../slices/CabangSlice";
-import { CabangData } from "../../slices/ConfigSlice";
 import { SetMenuActive } from "../../slices/MenuSlice";
+import { CabangData } from "../../slices/CabangSlice";
+import DetailOrForm from "./Detail";
 
 type Props = {
   menu: RouteInterface;
 };
 
+export type Detail = {
+  action: string;
+  data: CabangData | null;
+};
 const CabangPage = ({ menu }: Props) => {
   const dispatch = useAppDispatch();
 
@@ -38,12 +49,9 @@ const CabangPage = ({ menu }: Props) => {
     setParams({ ...params, ...data });
   };
 
-  const [detail, setDetail] = useState<CabangData | null | undefined>(
-    undefined
-  );
+  const [detail, setDetail] = useState<Detail | null>(null);
 
-  const onAddAction = (data: CabangData) => {
-    if (detail !== undefined) return;
+  const onAddAction = (data: Detail) => {
     setDetail(data);
   };
 
@@ -75,18 +83,56 @@ const CabangPage = ({ menu }: Props) => {
     },
   ];
 
+  const [dataCollpase, setDataCollapse] = useState(false);
+
   return (
     <div className="">
       <h1 className="font-bold text-2xl mb-4">Cabang</h1>
-      <div className="flex gap-2">
+      <div className="flex">
         <div
-          className={`flex flex-col flex-grow w-full max-w-2xl rounded-lg bg-base-300 px-6 py-4 ${
-            detail === undefined && "hidden"
-          } transition-transform duration-150 ease-in`}
+          className={`relative rounded-lg bg-base-300 transition-all duration-700 ease-in-out ${
+            detail === null ? "w-0" : "w-full flex-grow mr-6"
+          } `}
         >
-          a
+          <div className="absolute -top-2 -right-2">
+            {detail && (
+              <button
+                onClick={() => {
+                  setDataCollapse(false);
+                  setDetail(null);
+                }}
+                className="btn btn-circle btn-sm btn-primary"
+              >
+                <IoClose />
+              </button>
+            )}
+          </div>
+          {detail && (
+            <DetailOrForm action={detail?.action} data={detail?.data} />
+          )}
         </div>
-        <div className="flex flex-col flex-grow rounded-lg bg-base-300 px-6 py-4 transition-transform duration-150 ease-in">
+        <div
+          className={`
+          flex flex-col
+          h-auto rounded-lg bg-base-300 
+          px-6 py-6 transition-all duration-500 ease-in relative w-full flex-grow
+          ${dataCollpase && "-mr-[95%]"}
+          `}
+        >
+          <div className="absolute -top-2 -left-2">
+            {detail && (
+              <button
+                onClick={() => setDataCollapse(!dataCollpase)}
+                className="btn btn-circle btn-sm btn-primary"
+              >
+                {dataCollpase ? (
+                  <IoChevronBackSharp />
+                ) : (
+                  <IoChevronForwardSharp />
+                )}
+              </button>
+            )}
+          </div>
           <Table
             data={listCabang}
             columns={columns}
