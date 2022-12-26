@@ -1,6 +1,6 @@
 import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { RouteInterface } from "../../components/Sidebar2/routes";
+import { RouteInterface } from "../../components/Sidebar/routes";
 
 export type MenuState = {
   active: RouteInterface | null;

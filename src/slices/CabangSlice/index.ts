@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
-import { FormResult, IGetParam } from "../../app/type.d";
+import { FormResult, GetParam } from "../../app/type.d";
 import { IFormCabang } from "../../pages/Cabang/Detail";
 import HttpCall from "../../utils/HttpCall";
 
@@ -33,7 +33,7 @@ const initialState: CabangState = {
 
 export const GetCabang = createAsyncThunk(
   "cabang/getCabang",
-  async (params: IGetParam) => {
+  async (params: GetParam) => {
     try {
       const { result } = (await HttpCall.get("/cabang", { params })).data;
       return result;

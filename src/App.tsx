@@ -7,10 +7,10 @@ import { PersistConfig, selectAppConfig } from "./slices/ConfigSlice";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./components/Navbar";
-import { RouteInterface, routes } from "./components/Sidebar2/routes";
+import { RouteInterface, routes } from "./components/Sidebar/routes";
 import { useHotkeys } from "react-hotkeys-hook";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
-import SidebarDua from "./components/Sidebar2";
+import Sidebar from "./components/Sidebar";
 import { getPages } from "./pages";
 import Progressbar from "./components/Progressbar";
 // import NotfoundPage from "./pages/Notfound";
@@ -150,12 +150,12 @@ const MainLayout = (): JSX.Element => {
     <div className="h-screen">
       <Navbar setCheckedCb={setCheckedCb} />
       <div className="overflow-hidden">
-        <SidebarDua>
+        <Sidebar>
           <Routes>
             {routes.map(renderRoute)}
             <Route path="/login" element={<Navigate replace to="/" />} />
           </Routes>
-        </SidebarDua>
+        </Sidebar>
       </div>
     </div>
   );

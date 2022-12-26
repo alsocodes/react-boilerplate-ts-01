@@ -1,154 +1,87 @@
-import React, {
-  FC,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
-import useKeyPress from "./useKeypress";
-import { RouteInterface, routes } from "./routes";
-// import SidebarItem from "./SidebarItem";
-import SidebarRoute from "./SidebarRoute";
-// import { accesses } from "../../mock-data/list-access";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useAppSelector } from "../../app/hooks";
+import { selectAppConfig } from "../../slices/ConfigSlice";
+import { selectMenu } from "../../slices/MenuSlice";
+import { routes } from "./routes";
 
-type Props = {
-  isShow: boolean;
-  setIsShow(bool: boolean): void;
+interface Props {
+  children: JSX.Element;
+}
+
+const SidebarItem = ({ active, route, hideLabel }: any) => {
+  const { name, type, label, icon: Icon, path } = route;
+  const isActive = active?.name === name ? "active" : "";
+
+  if (type === "label") {
+    return (
+      <li className="my-px" key={name}>
+        <span className={`flex font-medium text-sm px-4 my-1 rounded-lg`}>
+          {hideLabel ? "..." : label}
+        </span>
+      </li>
+    );
+  }
+  return (
+    <li className="my-px" key={name}>
+      <Link
+        to={path}
+        className={`flex flex-row items-center h-10 px-3 rounded-lg my-2 ${isActive}`}
+      >
+        <span className="flex items-center justify-center text-lg">
+          {Icon && <Icon fontSize={24} />}
+        </span>
+        <span className={`ml-3 ${hideLabel && "hidden"}`}>{label}</span>
+      </Link>
+    </li>
+  );
 };
-const accesses = ["BASEAPP_DASHBOARD_VIEW"];
-const initialState = { selectedIndex: -1 };
-const Sidebar: FC<Props> = ({ isShow, setIsShow }): JSX.Element => {
-  const bListMenu: RouteInterface[] = useMemo(() => [...routes], []);
-  const [listMenu, setListMenu] = useState([...bListMenu]);
-  const navigate = useNavigate();
 
-  const reducer = (state: any, action: any) => {
-    // console.log('isLabel', isLabel, action.type);
-    switch (action.type) {
-      case "arrowUp":
-        return {
-          selectedIndex:
-            state.selectedIndex > 0
-              ? state.selectedIndex -
-                (listMenu[state.selectedIndex - 1]?.name === "label" ? 2 : 1)
-              : listMenu.length - 1,
-        };
-      case "arrowDown":
-        return {
-          selectedIndex:
-            state.selectedIndex < listMenu.length - 1
-              ? state.selectedIndex +
-                (listMenu[state.selectedIndex + 1]?.name === "label" ? 2 : 1)
-              : 0,
-        };
-      case "select":
-        return { selectedIndex: action.payload };
-      default:
-        throw new Error();
-    }
-  };
+const Sidebar = ({ children }: Props) => {
+  const { active } = useAppSelector(selectMenu);
+  const { hideSidebar } = useAppSelector(selectAppConfig);
 
-  const SidebarArea = useRef(null);
-  const SearchInput = useRef<HTMLInputElement>(null);
-  const arrowUpPressed = useKeyPress("ArrowUp");
-  const arrowDownPressed = useKeyPress("ArrowDown");
-  const escapePressed = useKeyPress("Escape");
-  const enterPressed = useKeyPress("Enter");
-  const [state, dispatch] = useReducer(reducer, initialState);
-
+  const [hide, setHide] = useState(hideSidebar);
   useEffect(() => {
-    if (arrowUpPressed && isShow) {
-      dispatch({ type: "arrowUp" });
-    }
-  }, [arrowUpPressed, isShow]);
+    setHide(hideSidebar);
+  }, [hideSidebar]);
 
-  useEffect(() => {
-    if (arrowDownPressed && isShow) {
-      dispatch({ type: "arrowDown" });
-    }
-  }, [arrowDownPressed, isShow]);
-
-  useEffect(() => {
-    if (escapePressed && isShow) {
-      setIsShow(false);
-    }
-  }, [escapePressed, isShow, setIsShow]);
-
-  useEffect(() => {
-    if (enterPressed && isShow) {
-      // console.log('enter');
-      const route: RouteInterface = listMenu[state.selectedIndex];
-      navigate(route.path, { replace: true });
-      setIsShow(false);
-    }
-  }, [enterPressed, isShow, listMenu, navigate, setIsShow, state]);
-
-  useEffect(() => {
-    if (isShow) {
-      if (null !== SearchInput.current) SearchInput.current.focus();
-      setInputValue("");
-    }
-  }, [isShow]);
-
-  useEffect(() => {
-    // console.log(state);
-  }, [state]);
-
-  const [inputValue, setInputValue] = useState("");
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      // console.log(inputValue, bListMenu);
-      if (inputValue === "") setListMenu([...bListMenu]);
-      else
-        setListMenu(
-          bListMenu.filter((item) =>
-            item.title.toLowerCase().includes(inputValue.toLowerCase())
-          )
-        );
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, [inputValue, bListMenu]);
-
-  const [collapse, setCollapse] = useState("");
-
-  const onCollapse = (menu: string) => {
-    setCollapse(collapse === menu ? "" : menu);
+  const onMouseHover = (val: boolean) => {
+    if (!hideSidebar) return;
+    setHide(val);
   };
 
   return (
-    <div className="drawer-side" ref={SidebarArea}>
-      <label htmlFor="my-drawer" className="drawer-overlay"></label>
-      <div className="menu p-4 overflow-y-hidden h-screen w-80 bg-base-100 text-base-content">
-        <div className="form-control">
-          <input
-            ref={SearchInput}
-            autoFocus
-            type="text"
-            placeholder="Pencarian ..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            className="input w-full max-w-xs input-sm"
-          />
+    // flex-row
+    <div className="flex min-h-screen bg-base-100 text-base-content">
+      <aside
+        onMouseOver={() => onMouseHover(false)}
+        onMouseOut={() => onMouseHover(true)}
+        className={`${
+          hide ? "w-0 md:w-20" : "w-44 md:w-52"
+        } bg-base-100 sidebar transition-all duration-300 ease-in-out overflow-hidden`}
+      >
+        <div className="sidebar-content px-4 py-2">
+          <ul className="menu flex flex-col w-full">
+            {routes.map((route, i) => {
+              return (
+                <SidebarItem
+                  hideLabel={hide}
+                  active={active}
+                  key={`s-${i}`}
+                  route={route}
+                />
+              );
+            })}
+          </ul>
         </div>
-        <hr className="mb-4 mt-4" />
-
-        {listMenu.map((item: RouteInterface, i: number): JSX.Element => {
-          return (
-            <SidebarRoute
-              key={`route-${i}`}
-              route={item}
-              accesses={accesses}
-              collapse={collapse}
-              selected={listMenu[state.selectedIndex]?.name}
-              setCollapse={onCollapse}
-              showSidebar={setIsShow}
-            />
-          );
-        })}
-      </div>
+      </aside>
+      {/* flexx flex-colx */}
+      <main className="main flex-grow transition-all duration-150 ease-in">
+        <div className="main-content flex flex-col flex-grow px-4 py-2">
+          {children}
+        </div>
+      </main>
     </div>
   );
 };

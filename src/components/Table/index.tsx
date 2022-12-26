@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from "react";
 import { IoChevronDownSharp } from "react-icons/io5";
 import SortableTH from "../SortableTH";
 
-type Props = {
+interface Props {
   zebra?: boolean;
   compact?: boolean;
   server?: boolean;
@@ -15,7 +15,7 @@ type Props = {
   onChange?: any;
   addAction?: any;
   loading?: boolean;
-};
+}
 
 const sizes = [10, 20, 50, 100];
 const Table: FC<Props> = ({

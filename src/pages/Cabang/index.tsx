@@ -7,22 +7,22 @@ import {
   IoTrashBinSharp,
 } from "react-icons/io5";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { IGetParam } from "../../app/type";
-import { RouteInterface } from "../../components/Sidebar2/routes";
+import { GetParam } from "../../app/type";
+import { RouteInterface } from "../../components/Sidebar/routes";
 import Table from "../../components/Table";
 import { GetCabang, selectCabang } from "../../slices/CabangSlice";
 import { SetMenuActive } from "../../slices/MenuSlice";
 import { CabangData } from "../../slices/CabangSlice";
 import DetailOrForm from "./Detail";
 
-type Props = {
+interface Props {
   menu: RouteInterface;
-};
+}
 
-export type Detail = {
+export interface Detail {
   action: string;
   data: CabangData | null;
-};
+}
 const CabangPage = ({ menu }: Props) => {
   const dispatch = useAppDispatch();
 
@@ -32,7 +32,7 @@ const CabangPage = ({ menu }: Props) => {
   }, [menu, dispatch]);
 
   const { listCabang, count, loading } = useAppSelector(selectCabang);
-  const [params, setParams] = useState<IGetParam>({
+  const [params, setParams] = useState<GetParam>({
     page: 1,
     size: 20,
     search: "",

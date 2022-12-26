@@ -4,11 +4,7 @@ import { Logout, selectAuth } from "../../slices/AuthSlice";
 import { SetSidebar } from "../../slices/ConfigSlice";
 import ThemeSwitcher from "../ThemeSwitcher";
 
-type Props = {
-  setCheckedCb(boolean: boolean): void;
-};
-
-const Navbar: FC<Props> = ({ setCheckedCb }): JSX.Element => {
+const Navbar = (): JSX.Element => {
   const { userData } = useAppSelector(selectAuth);
   const dispatch = useAppDispatch();
   return (

@@ -1,8 +1,8 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from "react";
 
-type Props = {
+interface Props {
   progress: boolean;
-};
+}
 const Progressbar: FC<Props> = ({ progress }) => {
   const [progressValue, setProgressValue] = useState(0);
   useEffect(() => {
@@ -26,7 +26,7 @@ const Progressbar: FC<Props> = ({ progress }) => {
   return (
     <div
       className={`${
-        progressValue === 100 && 'hidden'
+        progressValue === 100 && "hidden"
       } absolute top-0 -left-1 -right-1 bg-base-100 rounded-full h-1.5 mb-4 `}
     >
       <div className={`bg-primary h-1.5 rounded-full w-[100%]`}></div>
