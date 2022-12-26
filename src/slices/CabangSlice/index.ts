@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../../app/store";
 import { FormResult, GetParam } from "../../app/type.d";
-import { IFormCabang } from "../../pages/Cabang/Detail";
+import { IFormCabang } from "../../pages/Cabang/Form";
 import HttpCall from "../../utils/HttpCall";
 
 export type CabangData = {
@@ -45,7 +45,32 @@ export const PostCabang = createAsyncThunk(
   "cabang/postCabang",
   async (payload: IFormCabang) => {
     try {
-      const { result } = (await HttpCall.post("/cabang", { ...payload })).data;
+      const { data } = await HttpCall.post("/cabang", {
+        ...payload,
+      });
+      return data;
+    } catch (error) {}
+  }
+);
+
+export const PutCabang = createAsyncThunk(
+  "cabang/putCabang",
+  async (payload: IFormCabang) => {
+    try {
+      const { data } = await HttpCall.put(`/cabang/${payload.publicId}`, {
+        ...payload,
+      });
+      return data;
+    } catch (error) {}
+  }
+);
+
+export const DeleteCabang = createAsyncThunk(
+  "cabang/deleteCabang",
+  async (payload: string) => {
+    try {
+      const { data } = await HttpCall.delete(`/cabang/${payload}`);
+      return data;
     } catch (error) {}
   }
 );
@@ -65,6 +90,41 @@ export const cabangSlice = createSlice({
       state.page = page;
       state.size = size;
       state.count = count;
+    });
+    builder.addCase(PostCabang.pending, (state: CabangState) => {
+      state.loading = true;
+    });
+    builder.addCase(PostCabang.fulfilled, (state: CabangState, { payload }) => {
+      state.formResult = payload;
+      state.loading = false;
+    });
+    builder.addCase(PostCabang.rejected, (state: CabangState) => {
+      state.loading = false;
+    });
+
+    builder.addCase(PutCabang.pending, (state: CabangState) => {
+      state.loading = true;
+    });
+    builder.addCase(PutCabang.fulfilled, (state: CabangState, { payload }) => {
+      state.formResult = payload;
+      state.loading = false;
+    });
+    builder.addCase(PutCabang.rejected, (state: CabangState) => {
+      state.loading = false;
+    });
+
+    builder.addCase(DeleteCabang.pending, (state: CabangState) => {
+      state.loading = true;
+    });
+    builder.addCase(
+      DeleteCabang.fulfilled,
+      (state: CabangState, { payload }) => {
+        state.formResult = payload;
+        state.loading = false;
+      }
+    );
+    builder.addCase(DeleteCabang.rejected, (state: CabangState) => {
+      state.loading = false;
     });
   },
 });

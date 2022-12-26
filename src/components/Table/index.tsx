@@ -15,6 +15,7 @@ interface Props {
   onChange?: any;
   addAction?: any;
   loading?: boolean;
+  rowEvent?: any;
 }
 
 const sizes = [10, 20, 50, 100];
@@ -31,6 +32,7 @@ const Table: FC<Props> = ({
   onChange,
   addAction,
   loading,
+  rowEvent,
 }) => {
   const { search, page, size, orderBy, order } = params;
   const pageingButtons = paginationGenerator(page, Math.ceil(count / size));
@@ -51,6 +53,12 @@ const Table: FC<Props> = ({
   const onParamChange = (data: any) => {
     if (loading) return;
     onChange(data);
+  };
+
+  const onRowClick = (data: any) => {
+    if (typeof rowEvent === "function") {
+      rowEvent({ action: "view", data });
+    }
   };
 
   return (
@@ -116,7 +124,11 @@ const Table: FC<Props> = ({
           ) : (
             data?.map((row, index) => {
               return (
-                <tr key={`row-${index}`} className={`${hover && "hover"}`}>
+                <tr
+                  onClick={() => onRowClick(row)}
+                  key={`row-${index}`}
+                  className={`${hover && "hover"}`}
+                >
                   {columns.map((c, ii) => {
                     const { field, func, w } = c;
                     const value =

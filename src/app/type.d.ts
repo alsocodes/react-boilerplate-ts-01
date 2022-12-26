@@ -3,11 +3,11 @@ export const APP_CONFIG_KEY = "APP_CONFIG_KEY";
 export const APP_LIST_CABANG = "APP_LIST_CABANG";
 export const APP_CABANG_SELECTED = "APP_CABANG_SELECTED";
 
-export type FormResult = {
+export interface FormResult {
   statusCode: number;
   message: string;
-  result?: any | any[] | null;
-};
+  publicId: string;
+}
 
 export type GetParam = {
   page?: number;

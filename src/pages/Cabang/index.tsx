@@ -3,23 +3,28 @@ import {
   IoChevronBackSharp,
   IoChevronForwardSharp,
   IoClose,
-  IoPencilSharp,
-  IoTrashBinSharp,
 } from "react-icons/io5";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { GetParam } from "../../app/type";
+import { GetParam } from "../../app/type.d";
 import { RouteInterface } from "../../components/Sidebar/routes";
 import Table from "../../components/Table";
-import { GetCabang, selectCabang } from "../../slices/CabangSlice";
+import {
+  DeleteCabang,
+  GetCabang,
+  selectCabang,
+} from "../../slices/CabangSlice";
 import { SetMenuActive } from "../../slices/MenuSlice";
 import { CabangData } from "../../slices/CabangSlice";
-import DetailOrForm from "./Detail";
+import Form from "./Form";
+import Detail from "./Detail";
+import { SetToastData } from "../../slices/ConfigSlice";
+import ModalConfirm from "../../components/ModalConfirm";
 
 interface Props {
   menu: RouteInterface;
 }
 
-export interface Detail {
+export interface DetailData {
   action: string;
   data: CabangData | null;
 }
@@ -31,7 +36,8 @@ const CabangPage = ({ menu }: Props) => {
     dispatch(SetMenuActive(payload));
   }, [menu, dispatch]);
 
-  const { listCabang, count, loading } = useAppSelector(selectCabang);
+  const { listCabang, count, loading, formResult } =
+    useAppSelector(selectCabang);
   const [params, setParams] = useState<GetParam>({
     page: 1,
     size: 20,
@@ -41,17 +47,52 @@ const CabangPage = ({ menu }: Props) => {
   });
 
   useEffect(() => {
-    // if (loading) return;
     dispatch(GetCabang(params));
-  }, [dispatch, params]);
+  }, [dispatch, formResult, params]);
+
+  useEffect(() => {
+    if (formResult) {
+      const { message } = formResult;
+      dispatch(SetToastData({ type: "success", message }));
+    }
+
+    if (formResult?.statusCode === 200 || formResult?.statusCode === 201) {
+      setModalConfrim(null);
+    }
+  }, [formResult]);
+
+  useEffect(() => {
+    if (!formResult || !listCabang) return;
+    const data = listCabang.find(
+      ({ publicId }) => publicId === formResult?.publicId,
+      null
+    );
+    if (data) setDetail({ action: "view", data });
+    else setDetail(null);
+  }, [formResult, listCabang]);
 
   const onTableChange = (data: any) => {
     setParams({ ...params, ...data });
   };
 
-  const [detail, setDetail] = useState<Detail | null>(null);
+  const [modalConfirm, setModalConfrim] = useState<any>(null);
 
-  const onAddAction = (data: Detail) => {
+  const onDeletePress = (data: any) => {
+    setModalConfrim({
+      title: "Konfirmasi hapus cabang",
+      message: `Apakah Anda yakin akan menghapus cabang ${data?.nama}?`,
+      action: () => dispatch(DeleteCabang(data?.publicId)),
+      cancel: () => setModalConfrim(null),
+    });
+  };
+
+  const [detail, setDetail] = useState<DetailData | null>(null);
+
+  useEffect(() => {
+    // console.log(detail);
+  }, [detail]);
+
+  const onAddAction = (data: DetailData) => {
     setDetail(data);
   };
 
@@ -60,27 +101,35 @@ const CabangPage = ({ menu }: Props) => {
     { field: "kode", label: "Kode", sort: true },
     { field: "nama", label: "Nama", sort: true },
     { field: "alamat", label: "Alamat" },
-    {
-      field: "",
-      label: "Action",
-      w: "100px",
-      func: (obj: any) => {
-        return (
-          <div className="flex gap-1">
-            <div className="tooltip" data-tip="Edit">
-              <button className="btn btn-sm btn-accent">
-                <IoPencilSharp />{" "}
-              </button>
-            </div>
-            <div className="tooltip" data-tip="Hapus">
-              <button className="btn btn-sm btn-error">
-                <IoTrashBinSharp />{" "}
-              </button>
-            </div>
-          </div>
-        );
-      },
-    },
+    // {
+    //   field: '',
+    //   label: 'Action',
+    //   w: '100px',
+    //   func: ({ row }: any) => {
+    //     return (
+    //       <div className='flex gap-1'>
+    //         <div className='tooltip' data-tip='Edit'>
+    //           <button
+    //             className='btn btn-sm btn-info'
+    //             onClick={() => setDetail({ action: 'view', data: row })}
+    //           >
+    //             <IoEyeSharp />{' '}
+    //           </button>
+    //         </div>
+    //         <div className='tooltip' data-tip='Edit'>
+    //           <button className='btn btn-sm btn-accent'>
+    //             <IoPencilSharp />{' '}
+    //           </button>
+    //         </div>
+    //         <div className='tooltip' data-tip='Hapus'>
+    //           <button className='btn btn-sm btn-error'>
+    //             <IoTrashBinSharp />{' '}
+    //           </button>
+    //         </div>
+    //       </div>
+    //     );
+    //   },
+    // },
   ];
 
   const [dataCollpase, setDataCollapse] = useState(false);
@@ -107,8 +156,18 @@ const CabangPage = ({ menu }: Props) => {
               </button>
             )}
           </div>
-          {detail && (
-            <DetailOrForm action={detail?.action} data={detail?.data} />
+          {detail ? (
+            detail.action === "add" || detail.action === "edit" ? (
+              <Form action={detail.action} data={detail.data} />
+            ) : (
+              <Detail
+                data={detail.data}
+                setDetail={setDetail}
+                onDeletePress={onDeletePress}
+              />
+            )
+          ) : (
+            ""
           )}
         </div>
         <div
@@ -145,8 +204,10 @@ const CabangPage = ({ menu }: Props) => {
             params={params}
             onChange={onTableChange}
             addAction={onAddAction}
+            rowEvent={setDetail}
             loading={loading}
           />
+          <ModalConfirm {...modalConfirm} show={modalConfirm !== null} />
         </div>
       </div>
     </div>
