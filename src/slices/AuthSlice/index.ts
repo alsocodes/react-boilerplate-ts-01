@@ -1,9 +1,9 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../../app/store";
-import { AUTH_KEY } from "../../app/type.d";
-import { IFormLogin } from "../../pages/Login";
-import HttpCall from "../../utils/HttpCall";
-import { SetToastData } from "../ConfigSlice";
+import { createAction, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { RootState } from '../../app/store';
+import { AUTH_KEY } from '../../app/type.d';
+import { IFormLogin } from '../../pages/Login';
+import HttpCall from '../../utils/HttpCall';
+import { SetToastData } from '../ConfigSlice';
 
 export type UserData = {
   id: string;
@@ -30,11 +30,11 @@ const initialState: AuthState = {
 };
 
 export const PostLogin = createAsyncThunk(
-  "auth/login",
+  'auth/login',
   async ({ username, password }: IFormLogin, { dispatch }) => {
     try {
       const { accessToken, refreshToken, user } = (
-        await HttpCall.post("/auth/login", {
+        await HttpCall.post('/auth/login', {
           username,
           password,
         })
@@ -50,16 +50,16 @@ export const PostLogin = createAsyncThunk(
       // Store auth token
       localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
       const toastData = {
-        type: "success",
-        message: "Login Berhasil",
+        type: 'success',
+        message: 'Login Berhasil',
       };
       dispatch(SetToastData(toastData));
       return userData;
     } catch (err: any) {
       // Cannot login!
       const toastData = {
-        type: "error",
-        message: err.response.data.message || "Error",
+        type: 'error',
+        message: err.response.data.message || 'Error',
       };
       dispatch(SetToastData(toastData));
 
@@ -69,11 +69,11 @@ export const PostLogin = createAsyncThunk(
 );
 
 export const RefreshLogin = createAsyncThunk(
-  "auth/refresh-login",
+  'auth/refresh-login',
   async (_) => {
     try {
       const { accessToken, refreshToken, user } = (
-        await HttpCall.get("/auth/refresh-login")
+        await HttpCall.get('/auth/refresh-login')
       ).data.result;
 
       const userData: UserData = {
@@ -83,7 +83,7 @@ export const RefreshLogin = createAsyncThunk(
         name: user.name,
         accesses: user.accesses,
       };
-      console.log("new acc", userData);
+      console.log('new acc', userData);
       // Store auth token
       localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
       return userData;
@@ -93,7 +93,7 @@ export const RefreshLogin = createAsyncThunk(
   }
 );
 
-export const PersistLogin = createAsyncThunk("auth/persistLogin", async () => {
+export const PersistLogin = createAsyncThunk('auth/persistLogin', async () => {
   try {
     const storage = localStorage.getItem(AUTH_KEY);
     const authData: UserData = storage ? JSON.parse(storage) : null;
@@ -103,18 +103,23 @@ export const PersistLogin = createAsyncThunk("auth/persistLogin", async () => {
   }
 });
 
-export const Logout = createAsyncThunk("auth/logout", async () => {
+export const Logout = createAsyncThunk('auth/logout', async () => {
   try {
-    await HttpCall.delete("/auth/logout");
     localStorage.removeItem(AUTH_KEY);
+    await HttpCall.delete('/auth/logout');
     return null;
   } catch (err) {
     throw err;
   }
 });
 
+export const LogoutLocal = createAsyncThunk('auth/logoutLocal', async () => {
+  localStorage.removeItem(AUTH_KEY);
+  return null;
+});
+
 export const authSlice = createSlice({
-  name: "auth",
+  name: 'auth',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -148,6 +153,13 @@ export const authSlice = createSlice({
       state.loading = false;
     });
     builder.addCase(Logout.fulfilled, (state: AuthState) => {
+      state.loggedIn = false;
+      state.persisting = false;
+      state.loading = false;
+      state.error = null;
+      state.userData = null;
+    });
+    builder.addCase(LogoutLocal.fulfilled, (state: AuthState) => {
       state.loggedIn = false;
       state.persisting = false;
       state.loading = false;

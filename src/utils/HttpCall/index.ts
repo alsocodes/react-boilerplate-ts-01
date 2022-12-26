@@ -1,10 +1,10 @@
-import axios from "axios";
-import { store } from "../../app/store";
-import { Logout, RefreshLogin } from "../../slices/AuthSlice";
-import { SetProgress, SetToastData } from "../../slices/ConfigSlice";
+import axios from 'axios';
+import { store } from '../../app/store';
+import { Logout, LogoutLocal, RefreshLogin } from '../../slices/AuthSlice';
+import { SetProgress, SetToastData } from '../../slices/ConfigSlice';
 
 const axiosApiInstance = axios.create({
-  baseURL: "http://192.168.0.26:9000",
+  baseURL: 'http://localhost:9000',
   timeout: 30000,
 });
 
@@ -14,12 +14,12 @@ axiosApiInstance.interceptors.request.use(
     store.dispatch(SetProgress(true));
     const userData = store.getState().auth.userData;
     const token =
-      config.url === "/auth/refresh-login"
+      config.url === '/auth/refresh-login'
         ? userData?.refreshToken
         : userData?.accessToken;
     config.headers = {
       Authorization: `Bearer ${token}`,
-      Accept: "application/json",
+      Accept: 'application/json',
     };
     return config;
   },
@@ -42,19 +42,27 @@ axiosApiInstance.interceptors.response.use(
       if (
         !originalRequest._retry &&
         userData?.refreshToken &&
-        error.config.url !== "/auth/refresh-login"
+        !['/auth/refresh-login', '/auth/logout'].includes(error.config.url)
       ) {
         originalRequest._retry = true;
         const { payload }: any = await store.dispatch(RefreshLogin());
         // console.log("xp", payload.accessToken);
 
-        axios.defaults.headers.common["Authorization"] =
-          "Bearer " + payload.accessToken;
+        axios.defaults.headers.common['Authorization'] =
+          'Bearer ' + payload.accessToken;
         return axiosApiInstance(originalRequest);
       }
-      store.dispatch(Logout());
+      store.dispatch(LogoutLocal());
     }
 
+    const message = error.response.data.message;
+    // console.log(message);
+    store.dispatch(
+      SetToastData({
+        type: 'error',
+        message: typeof message === 'string' ? message : message.join(', '),
+      })
+    );
     return Promise.reject(error);
   }
 );

@@ -1,71 +1,45 @@
-import React, { FC } from "react";
-import { useForm } from "react-hook-form";
-import { Detail } from "..";
-import TextInput from "../../../components/TextInput";
+import React from 'react';
+import { IoPencilSharp, IoTrashBinSharp } from 'react-icons/io5';
 
-export interface IFormCabang {
-  id?: string | null;
-  kode: string;
-  nama: string;
-  alamat: string;
-}
-
-const DetailOrForm: FC<Detail> = ({ action, data }) => {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<IFormCabang>();
-
-  const formSubmit = (data: IFormCabang) => {
-    console.log(data);
-  };
-
+const Detail = ({ data, setDetail, onDeletePress }: any) => {
   return (
-    <div className="p-6">
-      <form onSubmit={handleSubmit(formSubmit)}>
-        <div className="flex gap-4">
-          <div className="w-2/6">
-            <TextInput
-              layout="horizontal"
-              label="Kode"
-              className="uppercase"
-              name="kode"
-              type="text"
-              register={register("kode", { required: "Kode harus diisi" })}
-              errors={errors}
-            />
-          </div>
-          <div className="w-4/6">
-            <TextInput
-              layout="horizontal"
-              label="Nama"
-              name="nama"
-              type="text"
-              register={register("nama", { required: "Nama harus diisi" })}
-              errors={errors}
-            />
-          </div>
-        </div>
-        <div className="">
-          <TextInput
-            layout="horizontal"
-            label="Alamat"
-            name="alamat"
-            type="textarea"
-            register={register("alamat", { required: "Alamat harus diisi" })}
-            errors={errors}
-          />
-        </div>
+    <div className='p-6'>
+      <h3 className='font-semibold'>Detail Cabang</h3>
+
+      <div className='flex my-2'>
         <div>
-          <button className="btn btn-primary" type="submit">
-            {action === "add" ? "Tambahkan" : "Update"}
-          </button>
+          <label className='text-sm'>Kode</label>
+          <div>{data?.kode}</div>
         </div>
-      </form>
+      </div>
+      <div className='flex my-2'>
+        <div>
+          <label className='text-sm'>Nama</label>
+          <div>{data?.nama}</div>
+        </div>
+      </div>
+      <div className='flex my-2'>
+        <div>
+          <label className='text-sm'>Alamat</label>
+          <div>{data?.alamat}</div>
+        </div>
+      </div>
+      <div className='flex justify-start gap-2 mt-4'>
+        <button
+          className='btn btn-sm btn-accent'
+          onClick={() => setDetail({ action: 'edit', data })}
+        >
+          <IoPencilSharp /> edit
+        </button>
+        <button
+          className='btn btn-sm btn-error'
+          onClick={() => onDeletePress(data)}
+        >
+          <IoTrashBinSharp /> Hapus
+        </button>
+      </div>
     </div>
   );
 };
 
-export default DetailOrForm;
+export default Detail;
